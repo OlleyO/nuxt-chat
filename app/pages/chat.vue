@@ -1,3 +1,18 @@
+<script lang="ts" setup>
+const { chat, messages, sendMessage } = useChat();
+const appConfig = useAppConfig();
+
+const title = computed(() =>
+  chat.value.title
+    ? `${chat.value.title} - ${appConfig.title}`
+    : appConfig.title
+);
+
+useHead({
+  title,
+});
+</script>
+
 <template>
-  <ChatWindow />
+  <ChatWindow :messages="messages" :chat="chat" @send-message="sendMessage" />
 </template>
