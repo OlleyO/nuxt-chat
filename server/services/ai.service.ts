@@ -18,7 +18,10 @@ export async function generateChatResponse(
     throw new Error("Invalid messages format");
   }
 
-  const response = await generateText({ model, messages });
+  const response = await generateText({
+    model,
+    messages,
+  });
 
   return response.text.trim();
 }

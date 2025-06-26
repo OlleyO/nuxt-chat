@@ -2,6 +2,8 @@
 const { chat, messages, sendMessage } = useChat();
 const appConfig = useAppConfig();
 
+const isTyping = ref(false);
+
 const title = computed(() =>
   chat.value.title
     ? `${chat.value.title} - ${appConfig.title}`
@@ -11,8 +13,19 @@ const title = computed(() =>
 useHead({
   title,
 });
+
+async function handleSendMessage(message: string) {
+  isTyping.value = true;
+  await sendMessage(message);
+  isTyping.value = false;
+}
 </script>
 
 <template>
-  <ChatWindow :messages="messages" :chat="chat" @send-message="sendMessage" />
+  <ChatWindow
+    :messages="messages"
+    :chat="chat"
+    :typing="isTyping"
+    @send-message="handleSendMessage"
+  />
 </template>
