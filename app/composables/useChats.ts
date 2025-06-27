@@ -9,7 +9,7 @@ export function useChats() {
 
     const chat: Chat = {
       id,
-      title: "New Chat",
+      title: `Chat ${id}`,
       messages: [],
       ...options,
       createdAt: new Date(),
