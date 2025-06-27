@@ -1,11 +1,22 @@
 <script lang="ts" setup>
-const { chat, messages, sendMessage } = useChat();
+const route = useRoute();
 const appConfig = useAppConfig();
+const {
+  chat: chatData,
+  messages,
+  sendMessage,
+} = useChat(route.params.id as string);
 
 const isTyping = ref(false);
 
+if (!chatData.value) {
+  await navigateTo("/", { replace: true });
+}
+
+const chat = computed(() => chatData.value);
+
 const title = computed(() =>
-  chat.value.title
+  chat.value?.title
     ? `${chat.value.title} - ${appConfig.title}`
     : appConfig.title
 );
@@ -23,6 +34,7 @@ async function handleSendMessage(message: string) {
 
 <template>
   <ChatWindow
+    v-if="chat"
     :messages="messages"
     :chat="chat"
     :typing="isTyping"
