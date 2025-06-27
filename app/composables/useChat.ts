@@ -1,11 +1,27 @@
-import type { Chat, ChatMessage, MessageRole } from "~/types";
-import { MOCK_CHAT } from "#imports";
+import type { Chat, ChatMessage } from "~/types";
 
-export default function useChat() {
-  const chat = ref<Chat>(MOCK_CHAT);
-  const messages = computed<ChatMessage[]>(() => chat.value.messages);
+export default function useChat(chatId: string) {
+  const { chats } = useChats();
 
-  function createMessage(message: string, role: MessageRole) {
+  const chat = computed(() => chats.value.find((chat) => chat.id === chatId));
+
+  const messages = computed<ChatMessage[]>(() => chat.value?.messages || []);
+
+  function updateChat(chat: Partial<Chat>) {
+    if (!chat.id) return;
+
+    const index = chats.value.findIndex((c) => c.id === chat.id);
+
+    if (index !== -1) {
+      chats.value[index] = {
+        ...chats.value[index],
+        ...chat,
+        id: chatId,
+      } as Chat;
+    }
+  }
+
+  function createMessage(message: string, role: ChatMessage["role"]) {
     const id = messages.value.length.toString();
 
     return {
@@ -16,7 +32,10 @@ export default function useChat() {
   }
 
   async function sendMessage(message: string) {
-    chat.value.messages.push(createMessage(message, "user"));
+    updateChat({
+      id: chatId,
+      messages: [...messages.value, createMessage(message, "user")],
+    });
 
     const data = await $fetch<ChatMessage>("/api/ai", {
       method: "POST",
@@ -25,7 +44,11 @@ export default function useChat() {
       },
     });
 
-    chat.value.messages.push(data);
+    updateChat({
+      id: chatId,
+      messages: [...messages.value, data],
+      updatedAt: new Date(),
+    });
   }
 
   return {
