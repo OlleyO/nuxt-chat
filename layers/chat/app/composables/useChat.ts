@@ -1,4 +1,4 @@
-import type { Chat, ChatMessage } from "~/types";
+import type { Chat, ChatMessage } from "~/layers/chat/app/types";
 
 export default function useChat(chatId: string) {
   const { chats } = useChats();
